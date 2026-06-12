@@ -1,5 +1,6 @@
 'use client'
 
+import { motion } from 'framer-motion'
 import React, { useState, useMemo } from 'react'
 import dynamic from 'next/dynamic'
 import {
@@ -165,19 +166,57 @@ export default function Home() {
     }
   }
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.08,
+        delayChildren: 0.1,
+      },
+    },
+  }
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 12 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.5, ease: 'easeOut' as const },
+    },
+  }
+
+  const sheetVariants = {
+    hidden: { opacity: 0, y: 30 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.6, ease: 'easeOut' as const, delay: 0.3 },
+    },
+  }
+
   return (
-    <div className="h-screen w-screen overflow-hidden bg-[var(--bg-primary)] text-[var(--text-primary)] relative">
+    <motion.div
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+      className="h-screen w-screen overflow-hidden bg-[var(--bg-primary)] text-[var(--text-primary)] relative"
+    >
       {/* 🌸 Background: Full-screen 3D Viewer */}
       <div className="absolute inset-0 z-0">
         <CustomizerViewer config={config} />
       </div>
 
       {/* 🌸 Floating Top Bar */}
-      <header className="absolute top-0 left-0 right-0 z-50 px-4 py-3 md:px-6 md:py-4 flex items-center justify-between bg-gradient-to-b from-[var(--bg-primary)]/80 to-transparent">
+      <motion.header
+        variants={itemVariants}
+        layout
+        className="absolute top-0 left-0 right-0 z-50 px-4 py-3 md:px-6 md:py-4 flex items-center justify-between liquid-glass bg-[var(--bg-primary)]/40"
+      >
         <div className="flex items-center gap-2.5">
           <span className="text-xl md:text-2xl">🌸</span>
           <div className="hidden sm:block">
-            <h1 className="text-sm md:text-lg font-bold tracking-wider bg-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent">
+            <h1 className="text-sm md:text-lg font-bold tracking-wider bg-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent animate-[gradient-shift_4s_ease_infinite] bg-[length:200%_200%]">
               FLORA GLASS
             </h1>
           </div>
@@ -200,25 +239,33 @@ export default function Home() {
           <span className="font-mono text-emerald-400 font-bold text-sm md:text-base">
             ฿{pricing.total.toLocaleString()}
           </span>
-          <button
+          <motion.button
             onClick={() => setShowOrderModal(true)}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             className="bg-gradient-to-r from-pink-500 to-indigo-500 hover:from-pink-600 hover:to-indigo-600 transition px-3 md:px-4 py-1.5 rounded-lg text-xs font-semibold shadow-lg shadow-pink-500/20 flex items-center gap-1.5"
           >
             <span className="hidden sm:inline">🛒</span> สั่งซื้อ
-          </button>
+          </motion.button>
         </div>
-      </header>
+      </motion.header>
 
       {/* 🌸 Reset Button - Floating on the left */}
-      <button
+      <motion.button
+        variants={itemVariants}
         onClick={handleReset}
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
         className="absolute top-20 left-4 z-50 px-2.5 py-1.5 rounded-lg bg-[var(--bg-primary)]/60 backdrop-blur border border-[var(--border)] hover:bg-[var(--bg-secondary)]/80 transition text-[10px] md:text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
       >
         🔄 รีเซ็ต
-      </button>
+      </motion.button>
 
       {/* 🌸 Bottom Sheet (Tab content + Tab bar) */}
-      <div className="absolute bottom-0 left-0 right-0 z-40 flex flex-col pointer-events-none">
+      <motion.div
+        variants={sheetVariants}
+        className="absolute bottom-0 left-0 right-0 z-40 flex flex-col pointer-events-none"
+      >
         {/* Tab Content Sheet */}
         <div
           className={`pointer-events-auto mx-auto w-full max-w-2xl transition-all duration-300 ease-out ${
@@ -227,7 +274,7 @@ export default function Home() {
               : 'translate-y-full opacity-0'
           }`}
         >
-          <div className="bg-[var(--bg-primary)]/90 backdrop-blur-xl border border-[var(--border)] rounded-t-2xl shadow-2xl max-h-[50vh] md:max-h-[40vh] flex flex-col">
+          <div className="liquid-glass bg-[var(--bg-primary)]/90 backdrop-blur-xl rounded-t-2xl shadow-2xl max-h-[50vh] md:max-h-[40vh] flex flex-col">
             {/* Drag Handle */}
             <div className="flex justify-center pt-2 pb-1">
               <div className="w-10 h-1 rounded-full bg-[var(--text-muted)]/50" />
@@ -237,238 +284,268 @@ export default function Home() {
             <div className="overflow-y-auto px-4 pb-4 flex-1">
               {/* TAB 1: GLASS */}
               {activeTab === 'glass' && (
-                <div className="flex flex-col gap-4 pt-1">
-                  <div>
-                    <h3 className="text-xs md:text-sm font-semibold text-[var(--text-primary)] mb-1">ทรงขวดแก้ว (Glass Shapes)</h3>
-                    <p className="text-[10px] md:text-xs text-[var(--text-muted)]">เลือกรูปทรงแก้วที่เหมาะสมสำหรับสไตล์การตกแต่งของคุณ</p>
-                  </div>
+                <motion.div
+                  key={activeTab}
+                  initial={{ opacity: 0, x: 10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.25, ease: 'easeOut' }}
+                >
+                  <div className="flex flex-col gap-4 pt-1">
+                    <div>
+                      <h3 className="text-xs md:text-sm font-semibold text-[var(--text-primary)] mb-1">ทรงขวดแก้ว (Glass Shapes)</h3>
+                      <p className="text-[10px] md:text-xs text-[var(--text-muted)]">เลือกรูปทรงแก้วที่เหมาะสมสำหรับสไตล์การตกแต่งของคุณ</p>
+                    </div>
 
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                    {GLASS_OPTIONS.map((g) => (
-                      <button
-                        key={g.id}
-                        onClick={() => handleGlassTypeChange(g.id)}
-                        className={`flex flex-col items-start p-2.5 md:p-3 rounded-lg border text-left transition-all ${
-                          config.glass === g.id
-                            ? 'border-pink-500/80 bg-pink-500/5 text-pink-100 shadow-lg shadow-pink-500/5'
-                            : 'border-[var(--border)] hover:border-[var(--text-muted)] hover:bg-[var(--bg-tertiary)] text-[var(--text-secondary)]'
-                        }`}
-                      >
-                        <span className="text-[11px] md:text-xs font-semibold">{g.nameTH}</span>
-                        <span className="text-[9px] md:text-[10px] text-[var(--text-muted)] mt-0.5">{g.nameEN}</span>
-                        <span className="text-[10px] md:text-xs font-mono text-emerald-400 mt-1.5 font-medium">฿{g.price}</span>
-                      </button>
-                    ))}
-                  </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                      {GLASS_OPTIONS.map((g) => (
+                        <button
+                          key={g.id}
+                          onClick={() => handleGlassTypeChange(g.id)}
+                          className={`flex flex-col items-start p-2.5 md:p-3 rounded-lg border text-left transition-all ${
+                            config.glass === g.id
+                              ? 'border-pink-500/80 bg-pink-500/5 text-pink-100 shadow-lg shadow-pink-500/5'
+                              : 'border-[var(--border)] hover:border-[var(--text-muted)] hover:bg-[var(--bg-tertiary)] text-[var(--text-secondary)]'
+                          }`}
+                        >
+                          <span className="text-[11px] md:text-xs font-semibold">{g.nameTH}</span>
+                          <span className="text-[9px] md:text-[10px] text-[var(--text-muted)] mt-0.5">{g.nameEN}</span>
+                          <span className="text-[10px] md:text-xs font-mono text-emerald-400 mt-1.5 font-medium">฿{g.price}</span>
+                        </button>
+                      ))}
+                    </div>
 
-                  {/* Glass Color */}
-                  <div>
-                    <h3 className="text-xs md:text-sm font-semibold text-[var(--text-primary)] mb-2">สีของแก้ว (Glass Tint Color)</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {GLASS_OPTIONS.find((g) => g.id === config.glass)?.colorVariants.map((colorId) => {
-                        const colorInfo = GLASS_COLORS[colorId]
-                        if (!colorInfo) return null
-                        return (
-                          <button
-                            key={colorId}
-                            onClick={() => setConfig((prev) => ({ ...prev, glassColor: colorId as GlassColor }))}
-                            className={`flex items-center gap-1.5 md:gap-2 px-2 md:px-3 py-1.5 md:py-2 rounded-lg border text-[10px] md:text-xs transition-all ${
-                              config.glassColor === colorId
-                                ? 'border-pink-500/80 bg-pink-500/5 text-pink-100'
-                                : 'border-[var(--border)] hover:border-[var(--text-muted)] hover:bg-[var(--bg-tertiary)] text-[var(--text-secondary)]'
-                            }`}
-                          >
-                            <span
-                              className="w-3 h-3 md:w-3.5 md:h-3.5 rounded-full border border-[var(--border)] shadow-sm"
-                              style={{ backgroundColor: colorInfo.hex }}
-                            />
-                            <span>{colorInfo.labelTH}</span>
-                          </button>
-                        )
-                      })}
+                    {/* Glass Color */}
+                    <div>
+                      <h3 className="text-xs md:text-sm font-semibold text-[var(--text-primary)] mb-2">สีของแก้ว (Glass Tint Color)</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {GLASS_OPTIONS.find((g) => g.id === config.glass)?.colorVariants.map((colorId) => {
+                          const colorInfo = GLASS_COLORS[colorId]
+                          if (!colorInfo) return null
+                          return (
+                            <button
+                              key={colorId}
+                              onClick={() => setConfig((prev) => ({ ...prev, glassColor: colorId as GlassColor }))}
+                              className={`flex items-center gap-1.5 md:gap-2 px-2 md:px-3 py-1.5 md:py-2 rounded-lg border text-[10px] md:text-xs transition-all ${
+                                config.glassColor === colorId
+                                  ? 'border-pink-500/80 bg-pink-500/5 text-pink-100'
+                                  : 'border-[var(--border)] hover:border-[var(--text-muted)] hover:bg-[var(--bg-tertiary)] text-[var(--text-secondary)]'
+                              }`}
+                            >
+                              <span
+                                className="w-3 h-3 md:w-3.5 md:h-3.5 rounded-full border border-[var(--border)] shadow-sm"
+                                style={{ backgroundColor: colorInfo.hex }}
+                              />
+                              <span>{colorInfo.labelTH}</span>
+                            </button>
+                          )
+                        })}
+                      </div>
                     </div>
                   </div>
-                </div>
+                </motion.div>
               )}
 
               {/* TAB 2: FLOWERS */}
               {activeTab === 'flowers' && (
-                <div className="flex flex-col gap-3 pt-1">
-                  <div>
-                    <h3 className="text-xs md:text-sm font-semibold text-[var(--text-primary)] mb-1">จัดช่อดอกไม้ของคุณ (Bouquet Editor)</h3>
-                    <p className="text-[10px] md:text-xs text-[var(--text-muted)]">เลือกชนิดและสีดอกไม้ แล้วกดใส่ลงในแก้ว (สูงสุด 7 ดอก)</p>
-                  </div>
+                <motion.div
+                  key={activeTab}
+                  initial={{ opacity: 0, x: 10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.25, ease: 'easeOut' }}
+                >
+                  <div className="flex flex-col gap-3 pt-1">
+                    <div>
+                      <h3 className="text-xs md:text-sm font-semibold text-[var(--text-primary)] mb-1">จัดช่อดอกไม้ของคุณ (Bouquet Editor)</h3>
+                      <p className="text-[10px] md:text-xs text-[var(--text-muted)]">เลือกชนิดและสีดอกไม้ แล้วกดใส่ลงในแก้ว (สูงสุด 7 ดอก)</p>
+                    </div>
 
-                  {/* Flower Types Selector */}
-                  <div>
-                    <span className="text-[10px] md:text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider block mb-1.5">
-                      ชนิดดอกไม้ (Flower Type)
-                    </span>
-                    <div className="grid grid-cols-3 gap-1.5">
-                      {FLOWER_OPTIONS.map((f) => (
-                        <button
-                          key={f.id}
-                          onClick={() => setSelectedFlowerType(f.id)}
-                          className={`py-1.5 md:py-2 px-1 rounded-lg border text-center text-[10px] md:text-xs transition ${
-                            selectedFlowerType === f.id
-                              ? 'border-pink-500 bg-pink-500/10 text-pink-300 font-semibold'
-                              : 'border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--text-muted)]'
-                          }`}
-                        >
-                          {f.nameTH}
-                        </button>
-                      ))}
+                    {/* Flower Types Selector */}
+                    <div>
+                      <span className="text-[10px] md:text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider block mb-1.5">
+                        ชนิดดอกไม้ (Flower Type)
+                      </span>
+                      <div className="grid grid-cols-3 gap-1.5">
+                        {FLOWER_OPTIONS.map((f) => (
+                          <button
+                            key={f.id}
+                            onClick={() => setSelectedFlowerType(f.id)}
+                            className={`py-1.5 md:py-2 px-1 rounded-lg border text-center text-[10px] md:text-xs transition ${
+                              selectedFlowerType === f.id
+                                ? 'border-pink-500 bg-pink-500/10 text-pink-300 font-semibold'
+                                : 'border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--text-muted)]'
+                            }`}
+                          >
+                            {f.nameTH}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Colors Selector */}
+                    <div>
+                      <span className="text-[10px] md:text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider block mb-1.5">
+                        สีดอกไม้ (Flower Color)
+                      </span>
+                      <div className="flex flex-wrap gap-1.5">
+                        {FLOWER_COLORS.map((color) => (
+                          <button
+                            key={color.hex}
+                            onClick={() => setSelectedFlowerColor(color.hex)}
+                            className={`w-6 h-6 md:w-7 md:h-7 rounded-full border-2 transition-transform ${
+                              selectedFlowerColor === color.hex
+                                ? 'border-white scale-110 shadow-lg shadow-white/10'
+                                : 'border-[var(--border)] hover:scale-105'
+                            }`}
+                            style={{ backgroundColor: color.hex }}
+                            title={color.name}
+                          />
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Add Button */}
+                    <motion.button
+                      onClick={handleAddFlower}
+                      disabled={config.flowers.length >= 7}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      className="w-full py-2 md:py-2.5 rounded-lg bg-pink-500 hover:bg-pink-600 disabled:bg-[var(--bg-tertiary)] disabled:text-[var(--text-muted)] transition text-slate-950 font-bold text-[10px] md:text-xs flex items-center justify-center gap-1.5"
+                    >
+                      <span>➕ เพิ่มเข้าไปในแก้ว</span>
+                      <span className="font-normal text-[9px] md:text-[10px]">
+                        (+฿{FLOWER_OPTIONS.find((f) => f.id === selectedFlowerType)?.price})
+                      </span>
+                    </motion.button>
+
+                    {/* Current Bouquet List */}
+                    <div>
+                      <span className="text-[10px] md:text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider block mb-1.5">
+                        รายการดอกไม้ในแก้ว ({config.flowers.length} / 7 ดอก)
+                      </span>
+                      {config.flowers.length === 0 ? (
+                        <div className="border border-dashed border-[var(--border)] rounded-lg flex items-center justify-center p-4 text-center">
+                          <p className="text-[10px] md:text-xs text-[var(--text-muted)]">
+                            ยังไม่มีดอกไม้เลยค่ะ<br />กดเลือกดอกไม้ด้านบนแล้วคลิกเพิ่มได้เลย!
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="max-h-[100px] overflow-y-auto flex flex-col gap-1">
+                          {config.flowers.map((f, idx) => {
+                            const option = FLOWER_OPTIONS.find((fo) => fo.id === f.type)
+                            const colorName = FLOWER_COLORS.find((c) => c.hex === f.color)?.name || 'กำหนดเอง'
+                            return (
+                              <div
+                                key={`list-${idx}`}
+                                className="flex items-center justify-between p-1.5 md:p-2 rounded-lg bg-[var(--bg-primary)]/40 border border-[var(--border)] text-[10px] md:text-xs"
+                              >
+                                <div className="flex items-center gap-1.5 md:gap-2">
+                                  <span
+                                    className="w-2.5 h-2.5 md:w-3 md:h-3 rounded-full border border-[var(--border)] shadow-sm"
+                                    style={{ backgroundColor: f.color }}
+                                  />
+                                  <span className="font-medium">{option?.nameTH}</span>
+                                  <span className="text-[8px] md:text-[10px] text-[var(--text-muted)]">({colorName})</span>
+                                </div>
+                                <div className="flex items-center gap-2 md:gap-3">
+                                  <span className="text-emerald-400 font-mono">฿{option?.price}</span>
+                                  <button
+                                    onClick={() => handleRemoveFlower(idx)}
+                                    className="text-red-400 hover:text-red-300 font-semibold px-1 transition"
+                                  >
+                                    ลบ
+                                  </button>
+                                </div>
+                              </div>
+                            )
+                          })}
+                        </div>
+                      )}
                     </div>
                   </div>
-
-                  {/* Colors Selector */}
-                  <div>
-                    <span className="text-[10px] md:text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider block mb-1.5">
-                      สีดอกไม้ (Flower Color)
-                    </span>
-                    <div className="flex flex-wrap gap-1.5">
-                      {FLOWER_COLORS.map((color) => (
-                        <button
-                          key={color.hex}
-                          onClick={() => setSelectedFlowerColor(color.hex)}
-                          className={`w-6 h-6 md:w-7 md:h-7 rounded-full border-2 transition-transform ${
-                            selectedFlowerColor === color.hex
-                              ? 'border-white scale-110 shadow-lg shadow-white/10'
-                              : 'border-[var(--border)] hover:scale-105'
-                          }`}
-                          style={{ backgroundColor: color.hex }}
-                          title={color.name}
-                        />
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Add Button */}
-                  <button
-                    onClick={handleAddFlower}
-                    disabled={config.flowers.length >= 7}
-                    className="w-full py-2 md:py-2.5 rounded-lg bg-pink-500 hover:bg-pink-600 disabled:bg-[var(--bg-tertiary)] disabled:text-[var(--text-muted)] transition text-slate-950 font-bold text-[10px] md:text-xs flex items-center justify-center gap-1.5"
-                  >
-                    <span>➕ เพิ่มเข้าไปในแก้ว</span>
-                    <span className="font-normal text-[9px] md:text-[10px]">
-                      (+฿{FLOWER_OPTIONS.find((f) => f.id === selectedFlowerType)?.price})
-                    </span>
-                  </button>
-
-                  {/* Current Bouquet List */}
-                  <div>
-                    <span className="text-[10px] md:text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider block mb-1.5">
-                      รายการดอกไม้ในแก้ว ({config.flowers.length} / 7 ดอก)
-                    </span>
-                    {config.flowers.length === 0 ? (
-                      <div className="border border-dashed border-[var(--border)] rounded-lg flex items-center justify-center p-4 text-center">
-                        <p className="text-[10px] md:text-xs text-[var(--text-muted)]">
-                          ยังไม่มีดอกไม้เลยค่ะ<br />กดเลือกดอกไม้ด้านบนแล้วคลิกเพิ่มได้เลย!
-                        </p>
-                      </div>
-                    ) : (
-                      <div className="max-h-[100px] overflow-y-auto flex flex-col gap-1">
-                        {config.flowers.map((f, idx) => {
-                          const option = FLOWER_OPTIONS.find((fo) => fo.id === f.type)
-                          const colorName = FLOWER_COLORS.find((c) => c.hex === f.color)?.name || 'กำหนดเอง'
-                          return (
-                            <div
-                              key={`list-${idx}`}
-                              className="flex items-center justify-between p-1.5 md:p-2 rounded-lg bg-[var(--bg-primary)]/40 border border-[var(--border)] text-[10px] md:text-xs"
-                            >
-                              <div className="flex items-center gap-1.5 md:gap-2">
-                                <span
-                                  className="w-2.5 h-2.5 md:w-3 md:h-3 rounded-full border border-[var(--border)] shadow-sm"
-                                  style={{ backgroundColor: f.color }}
-                                />
-                                <span className="font-medium">{option?.nameTH}</span>
-                                <span className="text-[8px] md:text-[10px] text-[var(--text-muted)]">({colorName})</span>
-                              </div>
-                              <div className="flex items-center gap-2 md:gap-3">
-                                <span className="text-emerald-400 font-mono">฿{option?.price}</span>
-                                <button
-                                  onClick={() => handleRemoveFlower(idx)}
-                                  className="text-red-400 hover:text-red-300 font-semibold px-1 transition"
-                                >
-                                  ลบ
-                                </button>
-                              </div>
-                            </div>
-                          )
-                        })}
-                      </div>
-                    )}
-                  </div>
-                </div>
+                </motion.div>
               )}
 
               {/* TAB 3: RIBBON */}
               {activeTab === 'ribbon' && (
-                <div className="flex flex-col gap-4 pt-1">
-                  <div>
-                    <h3 className="text-xs md:text-sm font-semibold text-[var(--text-primary)] mb-1">เลือกริบบิ้นตกแต่ง (Decor Ribbon)</h3>
-                    <p className="text-[10px] md:text-xs text-[var(--text-muted)]">ผูกริบบิ้นเพิ่มความสวยงาม เรียบหรูที่คอขวดแก้ว</p>
-                  </div>
+                <motion.div
+                  key={activeTab}
+                  initial={{ opacity: 0, x: 10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.25, ease: 'easeOut' }}
+                >
+                  <div className="flex flex-col gap-4 pt-1">
+                    <div>
+                      <h3 className="text-xs md:text-sm font-semibold text-[var(--text-primary)] mb-1">เลือกริบบิ้นตกแต่ง (Decor Ribbon)</h3>
+                      <p className="text-[10px] md:text-xs text-[var(--text-muted)]">ผูกริบบิ้นเพิ่มความสวยงาม เรียบหรูที่คอขวดแก้ว</p>
+                    </div>
 
-                  <div className="flex flex-col gap-1.5">
-                    {RIBBON_OPTIONS.map((ribbon) => (
-                      <button
-                        key={ribbon.id}
-                        onClick={() => setConfig((prev) => ({ ...prev, ribbon: ribbon.id === 'none' ? null : ribbon.id }))}
-                        className={`flex items-center justify-between p-2.5 md:p-3 rounded-lg border text-left transition-all ${
-                          (config.ribbon === ribbon.id) || (config.ribbon === null && ribbon.id === 'none')
-                            ? 'border-pink-500/80 bg-pink-500/5 text-pink-100'
-                            : 'border-[var(--border)] hover:border-[var(--text-muted)] hover:bg-[var(--bg-tertiary)] text-[var(--text-secondary)]'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2 md:gap-3">
-                          {ribbon.color ? (
-                            <span
-                              className="w-3.5 h-3.5 md:w-4 md:h-4 rounded-full border border-[var(--border)] shadow-sm block"
-                              style={{ backgroundColor: ribbon.color }}
-                            />
-                          ) : (
-                            <span className="w-3.5 h-3.5 md:w-4 md:h-4 rounded-full border border-[var(--border)] border-dashed bg-[var(--bg-secondary)] block" />
-                          )}
-                          <span className="text-[11px] md:text-xs font-semibold">{ribbon.nameTH}</span>
-                        </div>
-                        <span className="text-[10px] md:text-xs font-mono text-emerald-400">
-                          {ribbon.price > 0 ? `+฿${ribbon.price}` : 'ฟรี'}
-                        </span>
-                      </button>
-                    ))}
+                    <div className="flex flex-col gap-1.5">
+                      {RIBBON_OPTIONS.map((ribbon) => (
+                        <button
+                          key={ribbon.id}
+                          onClick={() => setConfig((prev) => ({ ...prev, ribbon: ribbon.id === 'none' ? null : ribbon.id }))}
+                          className={`flex items-center justify-between p-2.5 md:p-3 rounded-lg border text-left transition-all ${
+                            (config.ribbon === ribbon.id) || (config.ribbon === null && ribbon.id === 'none')
+                              ? 'border-pink-500/80 bg-pink-500/5 text-pink-100'
+                              : 'border-[var(--border)] hover:border-[var(--text-muted)] hover:bg-[var(--bg-tertiary)] text-[var(--text-secondary)]'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2 md:gap-3">
+                            {ribbon.color ? (
+                              <span
+                                className="w-3.5 h-3.5 md:w-4 md:h-4 rounded-full border border-[var(--border)] shadow-sm block"
+                                style={{ backgroundColor: ribbon.color }}
+                              />
+                            ) : (
+                              <span className="w-3.5 h-3.5 md:w-4 md:h-4 rounded-full border border-[var(--border)] border-dashed bg-[var(--bg-secondary)] block" />
+                            )}
+                            <span className="text-[11px] md:text-xs font-semibold">{ribbon.nameTH}</span>
+                          </div>
+                          <span className="text-[10px] md:text-xs font-mono text-emerald-400">
+                            {ribbon.price > 0 ? `+฿${ribbon.price}` : 'ฟรี'}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                </motion.div>
               )}
 
               {/* TAB 4: NOTE */}
               {activeTab === 'note' && (
-                <div className="flex flex-col gap-4 pt-1">
-                  <div>
-                    <h3 className="text-xs md:text-sm font-semibold text-[var(--text-primary)] mb-1">เขียนการ์ดของขวัญ (Gift Card Message)</h3>
-                    <p className="text-[10px] md:text-xs text-[var(--text-muted)]">แนบคำอวยพรหรือข้อความน่ารักๆ ส่งไปพร้อมกับของขวัญชิ้นพิเศษ</p>
-                  </div>
+                <motion.div
+                  key={activeTab}
+                  initial={{ opacity: 0, x: 10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.25, ease: 'easeOut' }}
+                >
+                  <div className="flex flex-col gap-4 pt-1">
+                    <div>
+                      <h3 className="text-xs md:text-sm font-semibold text-[var(--text-primary)] mb-1">เขียนการ์ดของขวัญ (Gift Card Message)</h3>
+                      <p className="text-[10px] md:text-xs text-[var(--text-muted)]">แนบคำอวยพรหรือข้อความน่ารักๆ ส่งไปพร้อมกับของขวัญชิ้นพิเศษ</p>
+                    </div>
 
-                  <div className="flex flex-col">
-                    <textarea
-                      value={config.note}
-                      onChange={(e) => setConfig((prev) => ({ ...prev, note: e.target.value }))}
-                      maxLength={120}
-                      placeholder="พิมพ์ข้อความของคุณที่นี่... (สูงสุด 120 ตัวอักษร) เช่น 'Happy Birthday ขอให้มีความสุขมากๆ นะคะ'"
-                      className="w-full min-h-[100px] md:min-h-[120px] p-3 rounded-lg bg-[var(--bg-primary)]/80 border border-[var(--border)] text-xs md:text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-pink-500/50 resize-none font-sans"
-                    />
-                    <div className="text-right text-[9px] md:text-[10px] text-[var(--text-muted)] mt-1.5">
-                      {config.note.length} / 120 ตัวอักษร
+                    <div className="flex flex-col">
+                      <textarea
+                        value={config.note}
+                        onChange={(e) => setConfig((prev) => ({ ...prev, note: e.target.value }))}
+                        maxLength={120}
+                        placeholder="พิมพ์ข้อความของคุณที่นี่... (สูงสุด 120 ตัวอักษร) เช่น 'Happy Birthday ขอให้มีความสุขมากๆ นะคะ'"
+                        className="w-full min-h-[100px] md:min-h-[120px] p-3 rounded-lg bg-[var(--bg-primary)]/80 border border-[var(--border)] text-xs md:text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-pink-500/50 resize-none font-sans"
+                      />
+                      <div className="text-right text-[9px] md:text-[10px] text-[var(--text-muted)] mt-1.5">
+                        {config.note.length} / 120 ตัวอักษร
+                      </div>
                     </div>
                   </div>
-                </div>
+                </motion.div>
               )}
             </div>
           </div>
         </div>
 
         {/* 🌸 Bottom Tab Bar */}
-        <div className="pointer-events-auto mx-auto w-full max-w-lg px-2 pb-2 md:pb-3">
+        <motion.div variants={itemVariants} className="pointer-events-auto mx-auto w-full max-w-lg px-2 pb-2 md:pb-3">
           <div className="flex rounded-xl bg-[var(--bg-primary)]/85 backdrop-blur-lg border border-[var(--border)] p-1 shadow-xl">
             {TABS.map((tab) => (
               <button
@@ -485,8 +562,8 @@ export default function Home() {
               </button>
             ))}
           </div>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
       {/* 🌸 Overlay background dim when sheet is open */}
       {isSheetOpen && (
@@ -582,12 +659,14 @@ export default function Home() {
                   </div>
                 </div>
 
-                <button
+                <motion.button
                   type="submit"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                   className="w-full py-3 rounded-xl bg-gradient-to-r from-pink-500 to-indigo-500 hover:from-pink-600 hover:to-indigo-600 transition text-slate-950 font-bold text-xs mt-2"
                 >
                   🚀 ยืนยันสั่งซื้อสินค้า (Confirm Order)
-                </button>
+                </motion.button>
               </form>
             ) : (
               <div className="text-center py-6 flex flex-col items-center gap-4">
@@ -616,6 +695,6 @@ export default function Home() {
           </div>
         </div>
       )}
-    </div>
+    </motion.div>
   )
 }
